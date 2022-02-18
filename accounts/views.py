@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes, force_str 
 from .utils import activation_token
 from django.urls import reverse
 from django.core.mail import send_mail
