@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_bytes, force_str 
+from rest_framework.authtoken.views import ObtainAuthToken
 from .utils import activation_token
 from django.urls import reverse
 from django.core.mail import send_mail
@@ -12,6 +13,7 @@ from django.urls import reverse
 from decouple import config
 from rest_framework.authtoken.models import Token
 from django.shortcuts import redirect
+from rest_framework.permissions import IsAuthenticated
 
 from .serializer import UserSerializer
 from .models import User
@@ -92,3 +94,27 @@ def verification(request):
         return redirect(redirect_url)
     else:
         return redirect('/failed')
+
+
+class LoginView(ObtainAuthToken):
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token = Token.objects.get_or_create(user=user)
+        print(token)
+        return Response({
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'username': user.username,
+            'email': user.email,
+            'token': token[0].key
+        })
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        request.user.auth_token.delete()
+        return Response({"msg: Logged out"}, status=status.HTTP_200_OK)
