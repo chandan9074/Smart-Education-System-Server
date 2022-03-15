@@ -16,7 +16,7 @@ from django.shortcuts import redirect
 from rest_framework.permissions import IsAuthenticated
 
 from .serializer import UserSerializer
-from .models import User
+from .models import User, StudentPorfile, TeacherPorfile
 # Create your views here.
 
 class SignUpView(APIView):
@@ -29,45 +29,40 @@ class SignUpView(APIView):
         if(User.objects.filter(username=request.data["username"])):
             return Response({"msg": "Username Already Exist"}, status=status.HTTP_306_RESERVED)
 
-        # profile_data = {
-        #     "bio": "",
-        #     "address": "",
-        #     "website": "",
-        #     'linkedin': "",
-        #     'facebook': "",
-        #     "github": "",
-        #     "avatar": "",
-        #     "email": "",
-        #     "phone_no": ""
-        # }
-
         if serializer.is_valid():
-            # user_profile = Profile.objects.create(
-            #     bio="", address="", website="", linkedin="", facebook="", github="", avatar="", email="", phone_no="")
+            serializer.save()
+            user_data = User.objects.get(username = request.data["username"])
+            user_type = request.data["type"]
+            if(user_type == "student"):
+                user_profile = StudentPorfile.objects.create(guardian="", guardian_phone_no="", relation="", blood_group="", address="", dob="", user=user_data)
+                user_profile.save()
+            elif(user_type == "teacher"):
+                user_profile = TeacherPorfile.objects.create(phone_no="", blood_group="", address="", user=user_data)
+                user_profile.save()
+            
 
             # user_profile.save()
-            serializer.save()
 
             # user = (User.objects.get(username=serializer.data["username"]))
             # user.profile = Profile.objects.get(id=user_profile.id)
             # user.save()
 
-            user = User.objects.get(email=serializer.data["email"])
-            domain = get_current_site(request).domain
-            uid = urlsafe_base64_encode(force_bytes(user.id))
-            url = reverse('activate')
-            token = uid + '.' + activation_token.make_token(user)
-            activation_link = 'http://' + domain + url+'?token=' + token
-            body = "Hi, " + user.first_name + " " + user.last_name + \
-                "\nWelcome to Hackverse world.Click this link to varify your account.\n" + activation_link
+            # user = User.objects.get(email=serializer.data["email"])
+            # domain = get_current_site(request).domain
+            # uid = urlsafe_base64_encode(force_bytes(user.id))
+            # url = reverse('activate')
+            # token = uid + '.' + activation_token.make_token(user)
+            # activation_link = 'http://' + domain + url+'?token=' + token
+            # body = "Hi, " + user.first_name + " " + user.last_name + \
+            #     "\nWelcome to Hackverse world.Click this link to varify your account.\n" + activation_link
 
-            send_mail(
-                'Account Varification',
-                body,
-                config('EMAIL_HOST_USER'),
-                [user.email],
-                fail_silently=False,
-            )
+            # send_mail(
+            #     'Account Varification',
+            #     body,
+            #     config('EMAIL_HOST_USER'),
+            #     [user.email],
+            #     fail_silently=False,
+            # )
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors)
