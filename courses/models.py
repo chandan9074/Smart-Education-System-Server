@@ -7,7 +7,7 @@ from accounts.models import StudentPorfile, TeacherPorfile
 class Classes(models.Model):
     class_name = models.CharField(max_length=20)
     section = models.CharField(max_length=20)
-    students = models.ManyToManyField(StudentPorfile)
+    # students = models.ManyToManyField(StudentPorfile)
 
 
 class Courses(models.Model):
@@ -22,5 +22,3 @@ class Courses(models.Model):
 #     title = models.CharField(max_length=500)
 #     details = models.TextField()
 
-    
-    
