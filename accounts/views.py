@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from django.utils.encoding import force_bytes, force_str 
+from django.utils.encoding import force_str 
 from rest_framework.authtoken.views import ObtainAuthToken
 from .utils import activation_token
 from django.urls import reverse
@@ -75,7 +75,7 @@ def verification(request):
     token = splited_token[1]
     account_activation_token = activation_token
     try:
-        uid = force_text(urlsafe_base64_decode(uidb64))
+        uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(id=uid)
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
