@@ -20,9 +20,15 @@ class StudentPorfile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.user.username
+
 class TeacherPorfile(models.Model):
     phone_no = models.CharField(max_length=20, blank=True)
     blood_group = models.CharField(max_length=20, blank=True)
     address = models.CharField(max_length=300, blank=True)
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.user.username
