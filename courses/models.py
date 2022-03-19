@@ -28,14 +28,24 @@ class Courses(models.Model):
     classes = models.ManyToManyField(JoinClasses)
     instructor = models.ForeignKey(TeacherPorfile, on_delete=models.CASCADE, null=True)
 
+    def __str__(self):
+        return (self.title)+" "+(self.course_code)
+
 class CourseContent(models.Model):
     title = models.CharField(max_length=500)
     details = models.TextField()
     links = models.TextField()
     courses = models.ForeignKey(Courses, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return (self.courses.title)+" __ "+(self.title)
+
 class CourseContentFile(models.Model):
+    title=models.CharField(max_length=200, default="Content Link")
     file = models.FileField()
     course_content = models.ForeignKey(CourseContent, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return (self.course_content.courses.course_code)+" - "+(self.course_content.title)+" __ "+(self.title)
     
 
