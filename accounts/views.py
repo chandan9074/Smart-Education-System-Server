@@ -14,10 +14,9 @@ from decouple import config
 from rest_framework.authtoken.models import Token
 from django.shortcuts import redirect
 from rest_framework.permissions import IsAuthenticated
-
 from .serializer import UserSerializer
 from .models import User, StudentPorfile, TeacherPorfile
-# Create your views here.
+
 
 class SignUpView(APIView):
     def post(self, request):
@@ -113,3 +112,16 @@ class LogoutView(APIView):
     def get(self, request, format=None):
         request.user.auth_token.delete()
         return Response({"msg: Logged out"}, status=status.HTTP_200_OK)
+
+
+class AuthenticateStudent(APIView):
+    def post(self, request):
+        try:
+            user = User.objects.get(username=request.data["username"])
+            if(StudentPorfile.objects.get(user=user.id).dob==request.data["dob"]):
+                return Response({"username":user.username}, status=status.HTTP_200_OK)
+            else:
+                return Response({"msg":"DOB Doesn't Matched."}, status=status.HTTP_404_NOT_FOUND)
+
+        except User.DoesNotExist:
+            return Response({"msg":"User Doesn't Exist."}, status=status.HTTP_404_NOT_FOUND)

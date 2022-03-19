@@ -7,7 +7,17 @@ from accounts.models import StudentPorfile, TeacherPorfile
 class Classes(models.Model):
     class_name = models.CharField(max_length=20)
     section = models.CharField(max_length=20)
+
+    def __str__(self):
+        return (self.class_name)+(self.section)
+
+
+class JoinClasses(models.Model):
+    class_sec=models.ForeignKey(Classes, on_delete=models.CASCADE)
     students = models.ManyToManyField(StudentPorfile)
+
+    def __str__(self):
+        return (self.class_sec.class_name)+(self.class_sec.section)
 
 
 class Courses(models.Model):
@@ -15,7 +25,7 @@ class Courses(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     course_code = models.CharField(max_length=100)
-    classes = models.ManyToManyField(Classes)
+    classes = models.ManyToManyField(JoinClasses)
     instructor = models.ForeignKey(TeacherPorfile, on_delete=models.CASCADE, null=True)
 
 # class CourseContents(models.Model):
