@@ -1,6 +1,6 @@
 from rest_framework.response import Response
 from django.shortcuts import render
-from .serializer import CourseSerialzer, ClassesSerializer, CourseContentSerializer
+from .serializer import CourseSerialzer, ClassesSerializer, CourseContentSerializer, CourseContentFileSerializer
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
@@ -143,6 +143,53 @@ class CourseContentDetailsAPIView(APIView):
     def delete(self, request, pk):
         if(CourseContent.objects.filter(id=pk)).exists():
             serializer_del = CourseContent.objects.get(id=pk)
+            serializer_del.delete()
+            return Response({"msg": "delete Successfully"}, status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class CourseContentFileAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        course_content_file = CourseContentFile.objects.all()
+        course_content_file_serializer = CourseContentFileSerializer(course_content_file, many=True)
+
+        return Response(course_content_file_serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = CourseContentFileSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CourseContentFileDetailsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, pk):
+        try:
+            return CourseContentFile.objects.get(pk=pk)
+        except CourseContentFile.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def get(self, request, pk):
+        course_content_file = self.get_object(pk)
+        course_content_file_serializer = CourseContentFileSerializer(course_content_file)
+        return Response(course_content_file_serializer.data)
+
+    def put(self, request, pk):
+        course_content_file_obj = CourseContentFile.objects.get(id=pk)
+        serializer = CourseContentFileSerializer(course_content_file_obj, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        if(CourseContentFile.objects.filter(id=pk)).exists():
+            serializer_del = CourseContentFile.objects.get(id=pk)
             serializer_del.delete()
             return Response({"msg": "delete Successfully"}, status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)

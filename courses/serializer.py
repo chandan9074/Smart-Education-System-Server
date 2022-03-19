@@ -19,3 +19,8 @@ class CourseContentSerializer(ModelSerializer):
     class Meta:
         model = CourseContent
         fields = '__all__'
+
+class CourseContentFileSerializer(ModelSerializer):
+    class Meta:
+        model = CourseContentFile
+        fields = '__all__'
