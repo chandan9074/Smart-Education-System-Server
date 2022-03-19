@@ -18,7 +18,14 @@ class Courses(models.Model):
     classes = models.ManyToManyField(Classes)
     instructor = models.ForeignKey(TeacherPorfile, on_delete=models.CASCADE, null=True)
 
-# class CourseContents(models.Model):
-#     title = models.CharField(max_length=500)
-#     details = models.TextField()
+class CourseContent(models.Model):
+    title = models.CharField(max_length=500)
+    details = models.TextField()
+    links = models.TextField()
+    courses = models.ForeignKey(Courses, on_delete=models.CASCADE)
+
+class CourseContentFile(models.Model):
+    file = models.FileField()
+    course_content = models.ForeignKey(CourseContent, on_delete=models.CASCADE)
+    
 
