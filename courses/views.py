@@ -12,20 +12,12 @@ class CourseAPIView(APIView):
     def get(self, request):
         coursess=[]
         userprofile=StudentPorfile.objects.get(user=User.objects.get(username=request.user))
-        # print(userprofile.id)
         for cls in JoinClasses.objects.all():
             if cls.students.filter(id=userprofile.id):
-                # print(cls.students.filter(user=userprofile.id))
-                # if cls.classses.filter(id=Classes.objects.get(id=cls.id).id):
                 for course in Courses.objects.all():
-                    # clasName = course.classes.filter(id=Classes.objects.get(id=cls.id).id)
                     clasName = course.classes.filter(id=cls.id)
-
                     if clasName:
                         coursess.append(Courses.objects.get(id=course.id))
-                    # print(Courses.objects.get(classes=clasName))
-
-        # courses = Courses.objects.all()
 
         course_serializer = CourseSerialzer(coursess, many=True)
 

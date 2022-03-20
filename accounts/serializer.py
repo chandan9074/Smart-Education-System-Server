@@ -28,3 +28,9 @@ class StudentProfileSerialzer(ModelSerializer):
     class Meta:
         model = StudentPorfile
         fields = '__all__'
+
+class TeacherProfileSerialzer(ModelSerializer):
+    class Meta:
+        model = TeacherPorfile
+        fields = '__all__'
+        

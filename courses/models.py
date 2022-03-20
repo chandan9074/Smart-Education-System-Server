@@ -43,6 +43,7 @@ class CourseContent(models.Model):
 class CourseContentFile(models.Model):
     title=models.CharField(max_length=200, default="Content Link")
     file = models.FileField()
+    # type
     course_content = models.ForeignKey(CourseContent, on_delete=models.CASCADE)
 
     def __str__(self):

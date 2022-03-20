@@ -1,7 +1,9 @@
 from rest_framework.serializers import ModelSerializer
+
+from accounts.models import TeacherPorfile
 from .models import Courses, Classes, CourseContent, CourseContentFile
 
-from accounts.serializer import StudentProfileSerialzer
+from accounts.serializer import StudentProfileSerialzer, TeacherProfileSerialzer
 from .models import Classes, Courses, JoinClasses
 
 class ClassesSerialzer(ModelSerializer):
@@ -17,10 +19,10 @@ class JoinClassesSerialzer(ModelSerializer):
         fields = '__all__'
 
 class CourseSerialzer(ModelSerializer):
-    classes=JoinClassesSerialzer(many=True,read_only=True)
     class Meta:
         model = Courses
         fields = '__all__'
+        depth=3
 
 
 class ClassesSerializer(ModelSerializer):

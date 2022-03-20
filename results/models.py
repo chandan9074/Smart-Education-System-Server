@@ -17,13 +17,27 @@ class YearlyResult(models.Model):
     marks=models.IntegerField()
     total_marks=models.IntegerField()
     percentage=models.FloatField(blank=True,null=True)
-    comments=models.CharField(max_length=50, choices=comments)
+    comments=models.CharField(max_length=50, choices=comments, blank=True, null=True)
     class_name=models.ForeignKey(Classes, on_delete=models.CASCADE)
     students=models.ForeignKey(StudentPorfile, on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
-        if not self.percentage:
-                self.identity = (self.marks/self.total_marks)*100
+        percentage=(self.marks/self.total_marks)*100
+        
+        self.percentage = percentage
+        
+        if  percentage>=80:
+            self.comments = "Excellent"
+        elif percentage >=70 and percentage<80:
+            self.comments = "Very Good"
+        elif percentage >=60 and percentage<70:
+            self.comments = "Good"
+        elif percentage >=50 and percentage<60:
+            self.comments = "Average"
+        elif percentage >=40 and percentage<50:
+            self.comments = "Bellow Average"
+        elif percentage<40:
+            self.comments = "Poor"
 
         super(YearlyResult, self).save(*args, **kwargs)
 
