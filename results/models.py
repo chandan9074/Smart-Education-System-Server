@@ -24,7 +24,7 @@ class YearlyResult(models.Model):
     def save(self, *args, **kwargs):
         percentage=(self.marks/self.total_marks)*100
         
-        self.percentage = percentage
+        self.percentage = "{:.2f}".format(percentage)
         
         if  percentage>=80:
             self.comments = "Excellent"
@@ -42,5 +42,5 @@ class YearlyResult(models.Model):
         super(YearlyResult, self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.students.user.username
+        return self.students.user.username +" ("+ self.class_name.class_name+self.class_name.section+")"
 
