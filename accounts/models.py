@@ -27,6 +27,8 @@ class TeacherPorfile(models.Model):
     phone_no = models.CharField(max_length=20, blank=True)
     blood_group = models.CharField(max_length=20, blank=True)
     address = models.CharField(max_length=300, blank=True)
+    dob = models.CharField(max_length=50, blank=True)
+
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
