@@ -12,9 +12,7 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 
 @receiver(post_save, sender=User)
-def save_profile(sender, instance, created, **kwargs):
-    print(instance.type)
-    
+def save_profile(sender, instance, created, **kwargs):    
     if instance.type=="student":
         if TeacherPorfile.objects.filter(user=instance):
             TeacherPorfile.objects.get(user=instance).delete()
