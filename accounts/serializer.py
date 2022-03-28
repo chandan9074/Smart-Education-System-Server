@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from .models import User
+from .models import *
 
 
 class UserSerializer(ModelSerializer):
@@ -22,3 +22,15 @@ class UserSerializer(ModelSerializer):
                                         username=username, email=email, password=password,type=type,is_active=False)
 
         return user
+
+
+class StudentProfileSerialzer(ModelSerializer):
+    class Meta:
+        model = StudentPorfile
+        fields = '__all__'
+
+class TeacherProfileSerialzer(ModelSerializer):
+    class Meta:
+        model = TeacherPorfile
+        fields = '__all__'
+        

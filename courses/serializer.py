@@ -1,13 +1,28 @@
-from ast import Mod
-from dataclasses import field, fields
-from pyexpat import model
 from rest_framework.serializers import ModelSerializer
+
+from accounts.models import TeacherPorfile
 from .models import Courses, Classes, CourseContent, CourseContentFile
+
+from accounts.serializer import StudentProfileSerialzer, TeacherProfileSerialzer
+from .models import Classes, Courses, JoinClasses
+
+class ClassesSerialzer(ModelSerializer):
+    class Meta:
+        model = Classes
+        fields = '__all__'
+
+class JoinClassesSerialzer(ModelSerializer):
+    students=StudentProfileSerialzer(many=True, read_only=True)
+    class_sec=ClassesSerialzer(read_only=True)
+    class Meta:
+        model = JoinClasses
+        fields = '__all__'
 
 class CourseSerialzer(ModelSerializer):
     class Meta:
         model = Courses
         fields = '__all__'
+        depth=3
 
 
 class ClassesSerializer(ModelSerializer):

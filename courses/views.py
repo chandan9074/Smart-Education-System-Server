@@ -1,19 +1,25 @@
 from rest_framework.response import Response
-from django.shortcuts import render
-from .serializer import CourseSerialzer, ClassesSerializer, CourseContentSerializer, CourseContentFileSerializer
+from accounts.models import StudentPorfile, User
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from .models import Courses, Classes, CourseContent, CourseContentFile
-# Create your views here.
+from .serializer import CourseSerialzer, ClassesSerializer, CourseContentSerializer, CourseContentFileSerializer
+from .models import Courses, Classes, CourseContent, CourseContentFile, JoinClasses
 
 
 class CourseAPIView(APIView):
     permission_classes = [IsAuthenticated]
-
     def get(self, request):
-        course = Courses.objects.all()
-        course_serializer = CourseSerialzer(course, many=True)
+        coursess=[]
+        userprofile=StudentPorfile.objects.get(user=User.objects.get(username=request.user))
+        for cls in JoinClasses.objects.all():
+            if cls.students.filter(id=userprofile.id):
+                for course in Courses.objects.all():
+                    clasName = course.classes.filter(id=cls.id)
+                    if clasName:
+                        coursess.append(Courses.objects.get(id=course.id))
+
+        course_serializer = CourseSerialzer(coursess, many=True)
 
         return Response(course_serializer.data, status=status.HTTP_200_OK)
 
@@ -23,6 +29,32 @@ class CourseAPIView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class StudentsCourse(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request,username):
+        coursess=[]
+        userprofile=StudentPorfile.objects.get(user=User.objects.get(username=username))
+        # print(userprofile.id)
+        for cls in JoinClasses.objects.all():
+            if cls.students.filter(id=userprofile.id):
+                # print(cls.students.filter(user=userprofile.id))
+                # if cls.classses.filter(id=Classes.objects.get(id=cls.id).id):
+                for course in Courses.objects.all():
+                    # clasName = course.classes.filter(id=Classes.objects.get(id=cls.id).id)
+                    clasName = course.classes.filter(id=cls.id)
+
+                    if clasName:
+                        coursess.append(Courses.objects.get(id=course.id))
+                    # print(Courses.objects.get(classes=clasName))
+
+        # courses = Courses.objects.all()
+
+        course_serializer = CourseSerialzer(coursess, many=True)
+
+        return Response(course_serializer.data, status=status.HTTP_200_OK)
+
 
 class CourseDetailsAPIView(APIView):
     permission_classes = [IsAuthenticated]
