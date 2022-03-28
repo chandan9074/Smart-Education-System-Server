@@ -76,6 +76,7 @@ class LoginView(ObtainAuthToken):
             'first_name': user.first_name,
             'last_name': user.last_name,
             'username': user.username,
+            'type': user.type,
             'email': user.email,
             'token': token.key
         })
