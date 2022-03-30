@@ -1,10 +1,12 @@
+from asyncio.windows_events import NULL
+from functools import partial
 from rest_framework.response import Response
 from accounts.models import StudentPorfile, TeacherPorfile, User
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from .serializer import CourseSerialzer, ClassesSerializer, CourseContentSerializer, CourseContentFileSerializer, HomeworkSerializer
-from .models import Courses, Classes, CourseContent, CourseContentFile, HomeWork, JoinClasses
+from .serializer import CourseSerialzer, ClassesSerializer, CourseContentSerializer, CourseContentFileSerializer, HomeworkSerializer, HomeworkSubmissionSerializer
+from .models import Courses, Classes, CourseContent, CourseContentFile, HomeWork, HomeWorkSubmission, JoinClasses
 
 
 class CourseAPIView(APIView):
@@ -279,3 +281,40 @@ class HomeWorkDetailsAPIView(APIView):
             obj_del.delete()
             return Response({"msg": "delete Successfully"}, status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class HomeWorkSubmissionAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request,pk):
+        homeworks = HomeWorkSubmission.objects.filter(homework_no=pk)
+        homework_serializer = HomeworkSubmissionSerializer(homeworks, many=True)
+
+        return Response(homework_serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request,pk):
+        home_work=HomeWorkSubmission.objects.create(submission_time=request.data["submission_time"],submitted_file=request.data["submitted_file"],answer=request.data["answer"],marks=request.data["marks"],homework_no=(HomeWork.objects.get(id=pk)),student=(StudentPorfile.objects.get(user=(User.objects.get(username=request.user).id))))
+
+        home_work.save()
+        homework_serializer=HomeworkSubmissionSerializer(home_work)
+        return Response(homework_serializer.data, status=status.HTTP_200_OK)
+        # return Response(homework_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class UpdateHomeworkMarksAPIView(APIView):
+
+    def put(self, request, pk):
+        homework_obj = HomeWorkSubmission.objects.get(id=pk)
+        serializer = HomeworkSubmissionSerializer(homework_obj, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class StudentsSubmissionAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request,pk):
+        user_profile=StudentPorfile.objects.get(user=(User.objects.get(username=request.user).id)).id
+        homeworks = HomeWorkSubmission.objects.get(homework_no=pk, student=user_profile)
+        homework_serializer = HomeworkSubmissionSerializer(homeworks)
+
+        return Response(homework_serializer.data, status=status.HTTP_200_OK)

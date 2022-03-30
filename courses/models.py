@@ -61,10 +61,10 @@ class HomeWork(models.Model):
         return self.course_content.courses.title+"__"+self.course_content.title+"_"+self.title
 
 class HomeWorkSubmission(models.Model):
-    submission_time=models.CharField(max_length=200, default=datetime.datetime.today(), blank=True, null=True)
+    submission_time=models.CharField(max_length=200, blank=True, null=True)
     submitted_file=models.FileField(upload_to='media/Homeworks',blank=True)
-    file_name=models.CharField(max_length=200, blank=True)
-    answer=models.TextField()
-    marks=models.FloatField()
+    # file_name=models.CharField(max_length=200, blank=True)
+    answer=models.TextField(blank=True, null=True)
+    marks=models.CharField(max_length=10,blank=True, null=True)
     student=models.ForeignKey(StudentPorfile, on_delete=models.CASCADE)
     homework_no=models.ForeignKey(HomeWork, on_delete=models.CASCADE)
