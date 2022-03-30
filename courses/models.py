@@ -1,4 +1,4 @@
-from pyexpat import model
+import datetime
 from django.db import models
 
 from accounts.models import StudentPorfile, TeacherPorfile
@@ -42,11 +42,29 @@ class CourseContent(models.Model):
 
 class CourseContentFile(models.Model):
     title=models.CharField(max_length=200, default="Content Link")
-    file = models.FileField()
-    # type
+    file=models.FileField()
     course_content = models.ForeignKey(CourseContent, on_delete=models.CASCADE)
 
     def __str__(self):
         return (self.course_content.courses.course_code)+" - "+(self.course_content.title)+" __ "+(self.title)
     
+class HomeWork(models.Model):
+    title=models.CharField(max_length=100, default="Home Work")
+    instruction=models.CharField(max_length=300,blank=True)
+    question=models.TextField()
+    total_marks=models.FloatField()
+    due_time=models.CharField(max_length=200, default=(datetime.datetime.today() + datetime.timedelta(days=3)))
+    file=models.FileField(upload_to='media/HomeworksQuestions',blank=True, null=True)
+    course_content=models.ForeignKey(CourseContent, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return self.course_content.courses.title+"__"+self.course_content.title+"_"+self.title
 
+class HomeWorkSubmission(models.Model):
+    submission_time=models.CharField(max_length=200, default=datetime.datetime.today(), blank=True, null=True)
+    submitted_file=models.FileField(upload_to='media/Homeworks',blank=True)
+    file_name=models.CharField(max_length=200, blank=True)
+    answer=models.TextField()
+    marks=models.FloatField()
+    student=models.ForeignKey(StudentPorfile, on_delete=models.CASCADE)
+    homework_no=models.ForeignKey(HomeWork, on_delete=models.CASCADE)

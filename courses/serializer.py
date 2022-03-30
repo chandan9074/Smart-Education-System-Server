@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer
 
 from accounts.models import TeacherPorfile
-from .models import Courses, Classes, CourseContent, CourseContentFile
+from .models import Courses, Classes, CourseContent, CourseContentFile, HomeWork, HomeWorkSubmission
 
 from accounts.serializer import StudentProfileSerialzer, TeacherProfileSerialzer
 from .models import Classes, Courses, JoinClasses
@@ -39,3 +39,14 @@ class CourseContentFileSerializer(ModelSerializer):
     class Meta:
         model = CourseContentFile
         fields = '__all__'
+
+class HomeworkSerializer(ModelSerializer):
+    class Meta:
+        model = HomeWork
+        fields = '__all__'
+
+class HomeworkSubmissionSerializer(ModelSerializer):
+    class Meta:
+        model = HomeWorkSubmission
+        fields = '__all__'
+

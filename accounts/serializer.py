@@ -25,11 +25,14 @@ class UserSerializer(ModelSerializer):
 
 
 class StudentProfileSerialzer(ModelSerializer):
+    user=UserSerializer(read_only=True)
     class Meta:
         model = StudentPorfile
         fields = '__all__'
 
 class TeacherProfileSerialzer(ModelSerializer):
+    user=UserSerializer(read_only=True)
+
     class Meta:
         model = TeacherPorfile
         fields = '__all__'

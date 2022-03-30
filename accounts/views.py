@@ -9,7 +9,7 @@ from decouple import config
 from rest_framework.authtoken.models import Token
 from django.shortcuts import redirect
 from rest_framework.permissions import IsAuthenticated
-from .serializer import UserSerializer
+from .serializer import StudentProfileSerialzer, UserSerializer
 from .models import User, StudentPorfile, TeacherPorfile
 
 
@@ -102,3 +102,23 @@ class AuthenticateStudent(APIView):
 
         except User.DoesNotExist:
             return Response({"msg":"User Doesn't Exist."}, status=status.HTTP_404_NOT_FOUND)
+
+class ProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            user=User.objects.get(username=request.user)
+            print(user)
+            if user.type=="student":
+                user_profile=StudentPorfile.objects.get(user=user.id)
+                profile_serializer=StudentProfileSerialzer(user_profile)
+                return Response(profile_serializer.data, status=status.HTTP_302_FOUND)
+
+            elif user.type=="teacher":
+                user_profile=TeacherPorfile.objects.get(user=user.id)
+                profile_serializer=StudentProfileSerialzer(user_profile)
+                return Response(profile_serializer.data, status=status.HTTP_302_FOUND)
+
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND) 

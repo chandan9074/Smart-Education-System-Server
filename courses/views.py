@@ -3,8 +3,8 @@ from accounts.models import StudentPorfile, TeacherPorfile, User
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from .serializer import CourseSerialzer, ClassesSerializer, CourseContentSerializer, CourseContentFileSerializer
-from .models import Courses, Classes, CourseContent, CourseContentFile, JoinClasses
+from .serializer import CourseSerialzer, ClassesSerializer, CourseContentSerializer, CourseContentFileSerializer, HomeworkSerializer
+from .models import Courses, Classes, CourseContent, CourseContentFile, HomeWork, JoinClasses
 
 
 class CourseAPIView(APIView):
@@ -237,3 +237,20 @@ class CourseContentFileDetailsAPIView(APIView):
             serializer_del.delete()
             return Response({"msg": "delete Successfully"}, status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class HomeWorkDetailsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        homework = HomeWork.objects.get(id=pk)
+        homework_serializer = HomeworkSerializer(homework)
+
+        return Response(homework_serializer.data, status=status.HTTP_200_OK)
+
+    # def post(self, request):
+    #     serializer = CourseContentFileSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
