@@ -5,8 +5,10 @@ from accounts.models import StudentPorfile, TeacherPorfile, User
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from .serializer import CourseSerialzer, ClassesSerializer, CourseContentSerializer, CourseContentFileSerializer, HomeworkSerializer, HomeworkSubmissionSerializer
-from .models import Courses, Classes, CourseContent, CourseContentFile, HomeWork, HomeWorkSubmission, JoinClasses
+
+from .serializer import CourseSerialzer, ClassesSerializer, CourseContentSerializer, CourseContentFileSerializer, HomeworkSerializer, CourseContentVideoSerializer,HomeworkSubmissionSerializer
+
+from .models import Courses, Classes, CourseContent, CourseContentFile, HomeWork, JoinClasses, CourseContentVideo,HomeWorkSubmission, JoinClasses
 
 
 class CourseAPIView(APIView):
@@ -150,12 +152,16 @@ class ClassesDetailsAPIView(APIView):
 class CourseContentAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        course_content = CourseContent.objects.all()
-        course_content_serializer = CourseContentSerializer(course_content, many=True)
+    def get(self, request, pk):
+        if(CourseContent.objects.filter(courses=pk)).exists():
+            course_content = CourseContent.objects.filter(courses=pk)
+            course_content_serializer = CourseContentSerializer(course_content, many=True)
+            return Response(course_content_serializer.data, status=status.HTTP_200_OK)
 
-        return Response(course_content_serializer.data, status=status.HTTP_200_OK)
 
+class CourseContentPostAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request):
         serializer = CourseContentSerializer(data=request.data)
         if serializer.is_valid():
@@ -241,6 +247,27 @@ class CourseContentFileDetailsAPIView(APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+class CourseContentFileByContentAPiView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        if(CourseContentFile.objects.filter(course_content=pk)).exists():
+            course_content = CourseContentFile.objects.filter(course_content=pk)
+            course_content_serializer = CourseContentFileSerializer(course_content, many=True)
+            return Response(course_content_serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class CourseContentVideoAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = CourseContentVideoSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            
 class HomeWorkAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -257,6 +284,27 @@ class HomeWorkAPIView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CourseContentVideoDetailsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, pk):
+        if(CourseContentVideo.objects.filter(id=pk)).exists():
+            serializer_del = CourseContentVideo.objects.get(id=pk)
+            serializer_del.delete()
+            return Response({"msg": "delete Successfully"}, status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class CourseContentGetVideoAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        if(CourseContentVideo.objects.filter(course_content=pk)).exists():
+            course_content = CourseContentVideo.objects.filter(course_content=pk)
+            course_content_serializer = CourseContentVideoSerializer(course_content, many=True)
+            return Response(course_content_serializer.data, status=status.HTTP_200_OK)
 
 class HomeWorkDetailsAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -318,3 +366,12 @@ class StudentsSubmissionAPIView(APIView):
         homework_serializer = HomeworkSubmissionSerializer(homeworks)
 
         return Response(homework_serializer.data, status=status.HTTP_200_OK)
+        
+class HomeworkDetailsByContentsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        if(HomeWork.objects.filter(course_content=pk)).exists():
+            course_content = HomeWork.objects.filter(course_content=pk)
+            course_content_serializer = HomeworkSerializer(course_content, many=True)
+            return Response(course_content_serializer.data, status=status.HTTP_200_OK)

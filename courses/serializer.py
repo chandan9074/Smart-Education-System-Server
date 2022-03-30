@@ -1,7 +1,9 @@
+from dataclasses import fields
+from pyexpat import model
 from rest_framework.serializers import ModelSerializer
 
 from accounts.models import TeacherPorfile
-from .models import Courses, Classes, CourseContent, CourseContentFile, HomeWork, HomeWorkSubmission
+from .models import Courses, Classes, CourseContent, CourseContentFile, HomeWork, HomeWorkSubmission, CourseContentVideo
 
 from accounts.serializer import StudentProfileSerialzer, TeacherProfileSerialzer
 from .models import Classes, Courses, JoinClasses
@@ -39,6 +41,11 @@ class CourseContentFileSerializer(ModelSerializer):
     class Meta:
         model = CourseContentFile
         fields = '__all__'
+
+class CourseContentVideoSerializer(ModelSerializer):
+    class Meta:
+        model=CourseContentVideo
+        fields='__all__'
 
 class HomeworkSerializer(ModelSerializer):
     class Meta:

@@ -41,12 +41,19 @@ class CourseContent(models.Model):
         return (self.courses.title)+" __ "+(self.title)
 
 class CourseContentFile(models.Model):
-    title=models.CharField(max_length=200, default="Content Link")
+    title=models.CharField(max_length=200, default="Content files")
     file=models.FileField()
     course_content = models.ForeignKey(CourseContent, on_delete=models.CASCADE)
 
     def __str__(self):
         return (self.course_content.courses.course_code)+" - "+(self.course_content.title)+" __ "+(self.title)
+
+
+class CourseContentVideo(models.Model):
+    title=models.CharField(max_length=200, blank=True)
+    video_link = models.TextField()
+    course_content = models.ForeignKey(CourseContent, on_delete=models.CASCADE)
+    
     
 class HomeWork(models.Model):
     title=models.CharField(max_length=100, default="Home Work")
