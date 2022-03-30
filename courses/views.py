@@ -1,27 +1,39 @@
 from rest_framework.response import Response
-from accounts.models import StudentPorfile, User
+from accounts.models import StudentPorfile, TeacherPorfile, User
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from .serializer import CourseSerialzer, ClassesSerializer, CourseContentSerializer, CourseContentFileSerializer
-from .models import Courses, Classes, CourseContent, CourseContentFile, JoinClasses
+from .serializer import CourseSerialzer, ClassesSerializer, CourseContentSerializer, CourseContentFileSerializer, HomeworkSerializer, CourseContentVideoSerializer
+from .models import Courses, Classes, CourseContent, CourseContentFile, HomeWork, JoinClasses, CourseContentVideo
 
 
 class CourseAPIView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
-        coursess=[]
-        userprofile=StudentPorfile.objects.get(user=User.objects.get(username=request.user))
-        for cls in JoinClasses.objects.all():
-            if cls.students.filter(id=userprofile.id):
-                for course in Courses.objects.all():
-                    clasName = course.classes.filter(id=cls.id)
-                    if clasName:
-                        coursess.append(Courses.objects.get(id=course.id))
+        try:
+            user = User.objects.get(username=request.user)
+            
+            if user.type=="student":
+                coursess=[]
+                userprofile=StudentPorfile.objects.get(user=user)
+                for cls in JoinClasses.objects.all():
+                    if cls.students.filter(id=userprofile.id):
+                        for course in Courses.objects.all():
+                            clasName = course.classes.filter(id=cls.id)
+                            if clasName:
+                                coursess.append(Courses.objects.get(id=course.id))
 
-        course_serializer = CourseSerialzer(coursess, many=True)
+                course_serializer = CourseSerialzer(coursess, many=True)
 
-        return Response(course_serializer.data, status=status.HTTP_200_OK)
+                return Response(course_serializer.data, status=status.HTTP_200_OK)
+
+            elif user.type=="teacher":
+                userprofile=TeacherPorfile.objects.get(user=user)
+                courses = Courses.objects.filter(instructor=userprofile.id)
+                course_serializer = CourseSerialzer(courses, many=True)
+                return Response(course_serializer.data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request):
         serializer = CourseSerialzer(data=request.data)
@@ -31,7 +43,7 @@ class CourseAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class StudentsCourse(APIView):
+class StudentsCourseView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request,username):
         coursess=[]
@@ -142,6 +154,10 @@ class CourseContentAPIView(APIView):
             course_content_serializer = CourseContentSerializer(course_content, many=True)
             return Response(course_content_serializer.data, status=status.HTTP_200_OK)
 
+
+class CourseContentPostAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request):
         serializer = CourseContentSerializer(data=request.data)
         if serializer.is_valid():
@@ -225,3 +241,61 @@ class CourseContentFileDetailsAPIView(APIView):
             serializer_del.delete()
             return Response({"msg": "delete Successfully"}, status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class CourseContentFileByContentAPiView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        if(CourseContentFile.objects.filter(course_content=pk)).exists():
+            course_content = CourseContentFile.objects.filter(course_content=pk)
+            course_content_serializer = CourseContentFileSerializer(course_content, many=True)
+            return Response(course_content_serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class CourseContentVideoAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = CourseContentVideoSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CourseContentVideoDetailsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, pk):
+        if(CourseContentVideo.objects.filter(id=pk)).exists():
+            serializer_del = CourseContentVideo.objects.get(id=pk)
+            serializer_del.delete()
+            return Response({"msg": "delete Successfully"}, status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class CourseContentGetVideoAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        if(CourseContentVideo.objects.filter(course_content=pk)).exists():
+            course_content = CourseContentVideo.objects.filter(course_content=pk)
+            course_content_serializer = CourseContentVideoSerializer(course_content, many=True)
+            return Response(course_content_serializer.data, status=status.HTTP_200_OK)
+
+class HomeWorkDetailsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        homework = HomeWork.objects.get(id=pk)
+        homework_serializer = HomeworkSerializer(homework)
+
+        return Response(homework_serializer.data, status=status.HTTP_200_OK)
+
+    # def post(self, request):
+    #     serializer = CourseContentFileSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
