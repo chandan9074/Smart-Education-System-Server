@@ -13,4 +13,5 @@ urlpatterns = [
     path('course-content-file-view/', CourseContentFileAPIView.as_view(), name="course-content-file-view"),
     path('course-content-file-details/<int:pk>', CourseContentFileDetailsAPIView.as_view(), name="course-content-file-details"),
     path('homework-details/<int:pk>', HomeWorkDetailsAPIView.as_view(), name="homework-details-details"),
+    path('homework/', HomeWorkAPIView.as_view(), name="homework-details-details"),
 ]

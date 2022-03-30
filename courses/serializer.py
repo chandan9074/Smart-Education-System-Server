@@ -44,6 +44,8 @@ class HomeworkSerializer(ModelSerializer):
     class Meta:
         model = HomeWork
         fields = '__all__'
+        extra_kwargs = {'file': {'required': False}}
+
 
 class HomeworkSubmissionSerializer(ModelSerializer):
     class Meta:
