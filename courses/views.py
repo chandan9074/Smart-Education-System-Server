@@ -136,11 +136,11 @@ class ClassesDetailsAPIView(APIView):
 class CourseContentAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        course_content = CourseContent.objects.all()
-        course_content_serializer = CourseContentSerializer(course_content, many=True)
-
-        return Response(course_content_serializer.data, status=status.HTTP_200_OK)
+    def get(self, request, pk):
+        if(CourseContent.objects.filter(courses=pk)).exists():
+            course_content = CourseContent.objects.filter(courses=pk)
+            course_content_serializer = CourseContentSerializer(course_content, many=True)
+            return Response(course_content_serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         serializer = CourseContentSerializer(data=request.data)
