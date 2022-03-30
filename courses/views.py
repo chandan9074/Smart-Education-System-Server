@@ -263,6 +263,24 @@ class CourseContentVideoAPIView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+            
+class HomeWorkAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        homework = HomeWork.objects.all()
+        homework_serializer = HomeworkSerializer(homework, many=True)
+
+        return Response(homework_serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = HomeworkSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.course_content=(CourseContent.objects.get(id=request.data["course_content"]))
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class CourseContentVideoDetailsAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -293,9 +311,17 @@ class HomeWorkDetailsAPIView(APIView):
 
         return Response(homework_serializer.data, status=status.HTTP_200_OK)
 
-    # def post(self, request):
-    #     serializer = CourseContentFileSerializer(data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def put(self, request, pk):
+        homework_obj = HomeWork.objects.get(id=pk)
+        serializer = HomeworkSerializer(homework_obj, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        if(HomeWork.objects.filter(id=pk)).exists():
+            obj_del = HomeWork.objects.get(id=pk)
+            obj_del.delete()
+            return Response({"msg": "delete Successfully"}, status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
