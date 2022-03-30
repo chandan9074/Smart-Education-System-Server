@@ -325,3 +325,12 @@ class HomeWorkDetailsAPIView(APIView):
             obj_del.delete()
             return Response({"msg": "delete Successfully"}, status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class HomeworkDetailsByContentsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        if(HomeWork.objects.filter(course_content=pk)).exists():
+            course_content = HomeWork.objects.filter(course_content=pk)
+            course_content_serializer = HomeworkSerializer(course_content, many=True)
+            return Response(course_content_serializer.data, status=status.HTTP_200_OK)
