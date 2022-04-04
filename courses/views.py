@@ -48,7 +48,7 @@ class CourseAPIView(APIView):
 
 
 class StudentsCourseView(APIView):
-    permission_classes = [IsAuthenticated]
+
     def get(self, request,username):
         coursess=[]
         userprofile=StudentPorfile.objects.get(user=User.objects.get(username=username))
@@ -371,7 +371,12 @@ class HomeworkDetailsByContentsAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
-        if(HomeWork.objects.filter(course_content=pk)).exists():
+        try:
+            user = HomeWork.objects.filter(course_content=pk)
             course_content = HomeWork.objects.filter(course_content=pk)
-            course_content_serializer = HomeworkSerializer(course_content, many=True)
-            return Response(course_content_serializer.data, status=status.HTTP_200_OK)
+            content_homework_serializer = HomeworkSerializer(course_content, many=True)
+            return Response(content_homework_serializer.data, status=status.HTTP_200_OK)
+
+        except HomeWork.DoesNotExist:
+            return Response({"msg":"No Homeworks"}, status=status.HTTP_404_NOT_FOUND)
+        

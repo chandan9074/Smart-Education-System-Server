@@ -2,7 +2,8 @@ from functools import partial
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from accounts.models import StudentPorfile, User
-from courses.models import Classes
+from courses.models import Classes, HomeWorkSubmission
+from courses.serializer import HomeworkSubmissionSerializer
 from results.models import YearlyResult
 from results.serializer import YearlyResultSerializer
 from rest_framework.views import APIView
@@ -69,3 +70,15 @@ class StudentsYearlyResultAPIView(APIView):
 
         return Response(result_serializer.data, status=status.HTTP_200_OK)
         
+
+class CoursewiseProressAPIView(APIView):
+
+    def get(self, request, pk):
+        try:
+            user = HomeWorkSubmission.objects.filter(student=pk)
+            course_content = HomeWorkSubmission.objects.filter(course_content=pk)
+            content_homework_serializer = HomeworkSubmissionSerializer(course_content, many=True)
+            return Response(content_homework_serializer.data, status=status.HTTP_200_OK)
+
+        except HomeWorkSubmission.DoesNotExist:
+            return Response({"msg":"No Homeworks"}, status=status.HTTP_404_NOT_FOUND)
