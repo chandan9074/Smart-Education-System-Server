@@ -97,7 +97,7 @@ class AuthenticateStudent(APIView):
         try:
             user = User.objects.get(username=request.data["username"])
             if(StudentPorfile.objects.get(user=user.id).dob==request.data["dob"]):
-                return Response({"username":user.username}, status=status.HTTP_200_OK)
+                return Response({"username":user.username, "dob":request.data["dob"]}, status=status.HTTP_200_OK)
             else:
                 return Response({"msg":"DOB Doesn't Matched."}, status=status.HTTP_404_NOT_FOUND)
 

@@ -21,7 +21,8 @@ class StudentPorfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.user.first_name + " " + self.user.last_name
+        # return self.user.first_name + " " + self.user.last_name
+        return self.user.username
 
 class TeacherPorfile(models.Model):
     phone_no = models.CharField(max_length=20, blank=True)
@@ -33,4 +34,5 @@ class TeacherPorfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.user.first_name + " " + self.user.last_name
+        # return self.user.first_name + " " + self.user.last_name
+        return self.user.username
