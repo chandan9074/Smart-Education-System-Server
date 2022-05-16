@@ -29,6 +29,7 @@ urlpatterns = [
     path('homework-details-by-content/<int:pk>', HomeworkDetailsByContentsAPIView.as_view(), name="homework-details-by-content"),
     path('class-details-by-student/<str:username>', ClassDetailsByStudentView.as_view(), name="class-details-by-student"),
     # path('StudentView/<int:pk>', StudentView.as_view(), name="class-details-by-student"),
+    path('homework-results/<str:username>/', HomeworkResult.as_view(), name="homework-results"),
     
     
 ]

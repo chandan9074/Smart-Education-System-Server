@@ -16,6 +16,9 @@ from .serializer import (ClassesSerializer, CourseContentFileSerializer,
                          CourseSerialzer, HomeworkSerializer,
                          HomeworkSubmissionSerializer,
                          JoinClassesClassSerialzer, JoinClassesSerialzer)
+from .serializer import CourseSerialzer, ClassesSerializer, CourseContentSerializer, CourseContentFileSerializer, HomeworkResultSerializer, HomeworkSerializer, CourseContentVideoSerializer,HomeworkSubmissionSerializer
+
+from .models import Courses, Classes, CourseContent, CourseContentFile, HomeWork, JoinClasses, CourseContentVideo,HomeWorkSubmission, JoinClasses
 
 
 class CourseAPIView(APIView):
@@ -58,7 +61,7 @@ class StudentsCourseView(APIView):
 
     def get(self, request,username):
         coursess=[]
-        userprofile=StudentPorfile.objects.get(user=User.objects.get(username=username))
+        userprofile=StudentPorfile.objects.get(user=User.objects.get(username=username).id)
         # print(userprofile.id)
         for cls in JoinClasses.objects.all():
             if cls.students.filter(id=userprofile.id):
@@ -347,7 +350,7 @@ class HomeWorkSubmissionAPIView(APIView):
         return Response(homework_serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request,pk):
-        home_work=HomeWorkSubmission.objects.create(submission_time=request.data["submission_time"],submitted_file=request.data["submitted_file"],answer=request.data["answer"],marks=request.data["marks"],homework_no=(HomeWork.objects.get(id=pk)),student=(StudentPorfile.objects.get(user=(User.objects.get(username=request.user).id))))
+        home_work=HomeWorkSubmission.objects.create(submission_time=request.data["submission_time"],submitted_file=request.data["submitted_file"],answer=request.data["answer"],marks=request.data["marks"],homework_no=(HomeWork.objects.get(id=pk)),student=(StudentPorfile.objects.get(user=request.user.id)))
 
         home_work.save()
         homework_serializer=HomeworkSubmissionSerializer(home_work)
@@ -404,3 +407,9 @@ class ClassDetailsByStudentView(APIView):
 #             class_serializer = JoinClassesSerialzer(user, many=True)
 
 #             return Response(class_serializer.data, status=status.HTTP_200_OK)
+
+class HomeworkResult(APIView):
+    def get(self, request, username):
+        results=HomeWorkSubmission.objects.filter(student=(StudentPorfile.objects.get(user=User.objects.get(username=username).id).id))
+        homework_result_serializer= HomeworkResultSerializer(results, many=True)
+        return Response(homework_result_serializer.data, status=status.HTTP_200_OK)

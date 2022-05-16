@@ -71,3 +71,12 @@ class HomeworkSubmissionSerializer(ModelSerializer):
         extra_kwargs = {'file': {'required': False},'answer': {'required': False},'student': {'required': False},'homework_no': {'required': False}}
 
 
+
+class HomeworkResultSerializer(ModelSerializer):
+    class Meta:
+        model = HomeWorkSubmission
+        fields = ["student", "marks","homework_no"]
+        depth=3
+        # extra_kwargs = {'file': {'required': False},'answer': {'required': False},'student': {'required': False},'homework_no': {'required': False}}
+
+
