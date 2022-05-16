@@ -123,3 +123,13 @@ class ProfileView(APIView):
 
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND) 
+
+class UserView(APIView):
+    # permission_classes = [IsAuthenticated]
+
+    def get(self, request, username):
+        if(User.objects.filter(username=username)).exists():
+            user = User.objects.get(username=username)
+            user_serializer = UserSerializer(user)
+            return Response(user_serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)

@@ -1,12 +1,15 @@
 from dataclasses import fields
+
+from accounts.models import TeacherPorfile
+from accounts.serializer import (StudentProfileSerialzer,
+                                 TeacherProfileSerialzer)
 from pyexpat import model
 from rest_framework.serializers import ModelSerializer
 
-from accounts.models import TeacherPorfile
-from .models import Courses, Classes, CourseContent, CourseContentFile, HomeWork, HomeWorkSubmission, CourseContentVideo
+from .models import (Classes, CourseContent, CourseContentFile,
+                     CourseContentVideo, Courses, HomeWork, HomeWorkSubmission,
+                     JoinClasses)
 
-from accounts.serializer import StudentProfileSerialzer, TeacherProfileSerialzer
-from .models import Classes, Courses, JoinClasses
 
 class ClassesSerialzer(ModelSerializer):
     class Meta:
@@ -19,6 +22,12 @@ class JoinClassesSerialzer(ModelSerializer):
     class Meta:
         model = JoinClasses
         fields = '__all__'
+class JoinClassesClassSerialzer(ModelSerializer):
+    # students=StudentProfileSerialzer(many=True, read_only=True)
+    class_sec=ClassesSerialzer(read_only=True)
+    class Meta:
+        model = JoinClasses
+        fields = ['class_sec']
 
 class CourseSerialzer(ModelSerializer):
     class Meta:
