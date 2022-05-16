@@ -27,6 +27,8 @@ urlpatterns = [
     path('course-content-file-details-by-content/<int:pk>', CourseContentFileByContentAPiView.as_view(), name="course-content-file-details-by-content"),
     
     path('homework-details-by-content/<int:pk>', HomeworkDetailsByContentsAPIView.as_view(), name="homework-details-by-content"),
+    path('class-details-by-student/<str:username>', ClassDetailsByStudentView.as_view(), name="class-details-by-student"),
+    # path('StudentView/<int:pk>', StudentView.as_view(), name="class-details-by-student"),
     
     
 ]

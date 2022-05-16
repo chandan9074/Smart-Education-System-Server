@@ -1,14 +1,21 @@
 from asyncio.windows_events import NULL
 from functools import partial
-from rest_framework.response import Response
+
 from accounts.models import StudentPorfile, TeacherPorfile, User
-from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from accounts.serializer import StudentProfileSerialzer
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from .serializer import CourseSerialzer, ClassesSerializer, CourseContentSerializer, CourseContentFileSerializer, HomeworkSerializer, CourseContentVideoSerializer,HomeworkSubmissionSerializer
-
-from .models import Courses, Classes, CourseContent, CourseContentFile, HomeWork, JoinClasses, CourseContentVideo,HomeWorkSubmission, JoinClasses
+from .models import (Classes, CourseContent, CourseContentFile,
+                     CourseContentVideo, Courses, HomeWork, HomeWorkSubmission,
+                     JoinClasses)
+from .serializer import (ClassesSerializer, CourseContentFileSerializer,
+                         CourseContentSerializer, CourseContentVideoSerializer,
+                         CourseSerialzer, HomeworkSerializer,
+                         HomeworkSubmissionSerializer,
+                         JoinClassesClassSerialzer, JoinClassesSerialzer)
 
 
 class CourseAPIView(APIView):
@@ -380,3 +387,20 @@ class HomeworkDetailsByContentsAPIView(APIView):
         except HomeWork.DoesNotExist:
             return Response({"msg":"No Homeworks"}, status=status.HTTP_404_NOT_FOUND)
         
+class ClassDetailsByStudentView(APIView):
+
+    def get(self, request, username):
+        if(JoinClasses.objects.filter(students__user__username=username)).exists():
+            user = JoinClasses.objects.filter(students__user__username=username)
+            class_serializer = JoinClassesClassSerialzer(user, many=True)
+
+            return Response(class_serializer.data, status=status.HTTP_200_OK)
+        return Response({"msg":"No user"}, status=status.HTTP_404_NOT_FOUND)
+
+# class StudentView(APIView):
+#     def get(self, request, pk):
+#         if(JoinClasses.objects.filter(students__id=pk)).exists():
+#             user = JoinClasses.objects.filter(students__id=pk)
+#             class_serializer = JoinClassesSerialzer(user, many=True)
+
+#             return Response(class_serializer.data, status=status.HTTP_200_OK)
